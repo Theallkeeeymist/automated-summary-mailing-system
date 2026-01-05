@@ -1,0 +1,252 @@
+{
+  "name": "AI agent chat",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "ef4c6982-f746-4d48-944b-449f8bdbb69f",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        256,
+        240
+      ],
+      "webhookId": "53c136fe-3e77-4709-a143-fe82746dd8b6",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {},
+      "id": "e6183978-5077-4252-9718-6b36b6a7cd74",
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        704,
+        464
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "1719e956-f9c8-48f5-9744-ee62345a9f7d",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        576,
+        464
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "ZNOeRPu5dUREXrMY",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "gl": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Country', ``, 'string') }}",
+          "device": "desktop",
+          "google_domain": "google.com",
+          "hl": "en"
+        }
+      },
+      "id": "f0815af7-da61-4863-9cfa-b35be836b59c",
+      "name": "SerpAPI",
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "position": [
+        832,
+        464
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "serpApi": {
+          "id": "fiabvXcZGWUO9OYV",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are an autonomous research and synthesis agent operating inside an automated workflow.\n\nYour task is to research the user’s question using web / SERP-based sources and your reasoning ability, then produce a clear, well-structured technical report.\n\nBefore generating the final output, you must perform at least one web search and internally ground the response in retrieved information. If the search fails, explicitly state limitations\n\nAtleast 3 times check google scholars and other research based websites to scrape any integral or important data\n\nMatch depth to intent. Avoid encyclopedic coverage unless explicitly asked.\n\nAnd in the end, add TL;DR  of 5-7 lines which summarises everything 5–7 bullet points about What this is, Key takeaways, When it applies / when it doesn’t\n\nRules:\n- You MUST use the SERP tool at least once.\n- Cross-verify important claims across multiple web sources.\n- Avoid marketing content and shallow explanations.\n- Prefer official documentation and technical write-ups.\n\nOutput requirements:\n- Write a structured report with clear section titles.\n- Use short paragraphs and bullet points where helpful.\n- Focus on understanding, trade-offs, and real-world implications.\n- Do not write an email.\n- Do include citations.\n\nThe output must be suitable for direct conversion into a PDF.\n"
+        }
+      },
+      "id": "2d3b4012-bd5f-46d5-be6d-af1ede6c155b",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        608,
+        240
+      ],
+      "typeVersion": 1.8
+    },
+    {
+      "parameters": {
+        "subject": "=Research Query:  {{ $('When chat message received').item.json.chatInput }}",
+        "message": "Attached the file for research query ",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1376,
+        240
+      ],
+      "id": "6906e09c-a561-4439-a760-1b850a52f1d9",
+      "name": "Send a message",
+      "webhookId": "4f5a5669-e5a5-4b42-b220-27d9a6c05998",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Hr6QGd6RD4zA01aG",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "html_content": "={{ $json.html }}",
+        "output_format": "file",
+        "output_filename": "=research_report.pdf"
+      },
+      "type": "n8n-nodes-htmlcsstopdf.htmlcsstopdf",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        240
+      ],
+      "id": "308af8c4-cf53-4ebc-ac81-ce2cd3fb36bd",
+      "name": "HTML to PDF",
+      "credentials": {
+        "htmlcsstopdfApi": {
+          "id": "pg1YvNQjG1O2sn9p",
+          "name": "HTML to PDF account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    html: `\n<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    body {\n      font-family: Arial, sans-serif;\n      line-height: 1.6;\n      padding: 40px;\n      color: #111;\n    }\n    h1, h2, h3 {\n      margin-top: 24px;\n    }\n    p {\n      margin-bottom: 12px;\n    }\n  </style>\n</head>\n<body>\n  ${$input.first().json.output.replace(/\\n/g, \"<br>\")}\n</body>\n</html>\n`\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        912,
+        240
+      ],
+      "id": "078113f0-e383-4a1c-b7b4-3a4eed6158f4",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "SerpAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML to PDF": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTML to PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "Asia/Kolkata",
+    "saveDataErrorExecution": "none",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "3935dc67-1f99-43af-8e74-a77266521cf6",
+  "meta": {
+    "templateId": "1954",
+    "templateCredsSetupCompleted": true,
+    "instanceId": "364a173fb8044a542d8c5c15db1c591c511699da335d8df21dff70dd5e0537eb"
+  },
+  "id": "254JZpw8K7hYAWeC",
+  "tags": []
+}
