@@ -32,16 +32,7 @@ The workflow is **template-ready**, credential-safe, and designed to demonstrate
 
 ## Workflow architecture
 
-Chat Trigger
-    ↓
-AI Agent (LLM + SERP Tool + Memory)
-    ↓
-HTML Renderer (JavaScript)
-    ↓
-HTML → PDF
-    ↓
-Email (PDF attachment)
-
+Chat Trigger -> AI Agent (LLM + SERP Tool + Memory) -> HTML Renderer (JavaScript) -> HTML → PDF -> Email (PDF attachment)
 
 ---
 
@@ -134,5 +125,11 @@ Users must configure the following credentials after importing the workflow:
 
 ## Environment variables (optional)
 
-env
-NOTIFICATION_EMAIL=your@email.com  
+```env
+NOTIFICATION_EMAIL=your@email.com
+```
+---
+
+For any Queries:
+
+sudhanshuanand4529@gmail.com
